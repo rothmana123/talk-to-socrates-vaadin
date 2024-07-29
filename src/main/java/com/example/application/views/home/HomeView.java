@@ -5,10 +5,13 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.ClickEvent;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
+import org.example.Conversation;
 
 @PageTitle("Home")
 @Menu(icon = "line-awesome/svg/pencil-ruler-solid.svg", order = 0)
@@ -16,21 +19,42 @@ import com.vaadin.flow.router.RouteAlias;
 @RouteAlias(value = "")
 public class HomeView extends Composite<VerticalLayout> {
 
+    private Conversation conversation;
+    private TextField askText;
+    private TextField replyText;
+    class MyClickListener
+            implements ComponentEventListener<ClickEvent<Button>> {
+        int count = 0;
+
+        @Override
+        public void onComponentEvent(ClickEvent<Button> event) {
+            //event.getSource()
+            //        .setText("You have clicked me " + (++count) + " times");
+            String reply= conversation.askQuestion("You are Plato", askText.getValue());
+            replyText.setValue(reply);
+        }
+    }
     public HomeView() {
-        TextField textField = new TextField();
-        Button buttonPrimary = new Button();
-        TextField textField2 = new TextField();
+        conversation = new Conversation("demo");
+        askText = new TextField();
+        Button askButton = new Button();
+        replyText = new TextField();
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
-        textField.setLabel("ask Socrates a Question");
-        textField.setWidth("min-content");
-        buttonPrimary.setText("Ask");
-        buttonPrimary.setWidth("min-content");
-        buttonPrimary.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        textField2.setLabel("Response");
-        textField2.setWidth("min-content");
-        getContent().add(textField);
-        getContent().add(buttonPrimary);
-        getContent().add(textField2);
+        askText.setLabel("ask Socrates a Question");
+        askText.setWidth("min-content");
+        askButton.setText("Ask");
+        askButton.setWidth("min-content");
+        askButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        replyText.setLabel("Response");
+        //replyText.setWidth("min-content");
+        getContent().add(askText);
+        getContent().add(askButton);
+        getContent().add(replyText);
+
+        askButton.addClickListener(new MyClickListener());
+
     }
+
+
 }
