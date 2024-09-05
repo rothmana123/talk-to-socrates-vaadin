@@ -1,3 +1,13 @@
+# instructions for Intellij Usage
+1. On the main page of this repo, click on code and HTML to copy the git URL for this repo
+2. In Intellij, File | New Project| From Version Control
+3. Control Click on the PeopleCode library in the lib folder and choose "Add to Library"
+4. in the src folder, find the Application class and run it.
+5. A browser window will open and show a local version of your webapp at localhost:8080
+
+
+# GENERATED DOCUMENTATION BELOW HERE
+
 # Custom project from Hilla
 
 This project can be used as a starting point to create your own Hilla application with Spring Boot.
