@@ -5,6 +5,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.router.Menu;
@@ -22,7 +23,7 @@ public class HomeView extends Composite<VerticalLayout> {
 
     private Conversation conversation;
     private TextField askText;
-    private TextField replyText;
+    private Paragraph replyText;
     class MyClickListener
             implements ComponentEventListener<ClickEvent<Button>> {
         int count = 0;
@@ -32,22 +33,25 @@ public class HomeView extends Composite<VerticalLayout> {
             //event.getSource()
             //        .setText("You have clicked me " + (++count) + " times");
             String reply= conversation.askQuestion("You are Plato", askText.getValue());
-            replyText.setValue(reply);
+            replyText.setText(reply);
         }
     }
     public HomeView() {
         conversation = new Conversation("demo");
         askText = new TextField();
         Button askButton = new Button();
-        replyText = new TextField();
+        replyText = new Paragraph();
+        replyText.setWidth("80%");
+        replyText.setHeight("300px");
+        replyText.getStyle().set("border", "1px solid black");
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
-        askText.setLabel("ask Socrates a Question");
+        askText.setLabel("Ask Socrates a Question");
         askText.setWidth("min-content");
         askButton.setText("Ask");
         askButton.setWidth("min-content");
         askButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        replyText.setLabel("Response");
+
         //replyText.setWidth("min-content");
         getContent().add(askText);
         getContent().add(askButton);
