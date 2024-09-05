@@ -11,7 +11,7 @@ import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-import org.example.Conversation;
+import org.peoplecode.Conversation;
 
 
 @PageTitle("Home")
