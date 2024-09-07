@@ -12,7 +12,7 @@ import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-import org.peoplecode.Conversation;
+import ai.peoplecode.OpenAIConversation;
 
 
 @PageTitle("Home")
@@ -21,7 +21,7 @@ import org.peoplecode.Conversation;
 @RouteAlias(value = "")
 public class HomeView extends Composite<VerticalLayout> {
 
-    private Conversation conversation;
+    private OpenAIConversation conversation;
     private TextField askText;
     private Paragraph replyText;
     class MyClickListener
@@ -37,7 +37,7 @@ public class HomeView extends Composite<VerticalLayout> {
         }
     }
     public HomeView() {
-        conversation = new Conversation("demo");
+        conversation = new OpenAIConversation("demo");
         askText = new TextField();
         Button askButton = new Button();
         replyText = new Paragraph();
