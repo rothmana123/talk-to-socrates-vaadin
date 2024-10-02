@@ -37,7 +37,7 @@ public class HomeView extends Composite<VerticalLayout> {
         }
     }
     public HomeView() {
-        conversation = new OpenAIConversation("demo");
+        conversation = new OpenAIConversation("demo", "gpt-4o-mini");
         askText = new TextField();
         Button askButton = new Button();
         replyText = new Paragraph();
