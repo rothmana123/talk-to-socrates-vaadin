@@ -265,7 +265,7 @@ public class HomeView extends Composite<VerticalLayout> {
         cityLabel.setText("Current City: " + currentCity.getName());
 
         // Clear evidence and set initial game context
-        evidenceList.setText("Evidence Accumulated: ");
+        evidenceList.getElement().setProperty("innerHTML", "Evidence Accumulated: ");  // Clear accumulated evidence
         replyText.setText("You have started a new game! The first city is " + currentCity.getName() + ".");
         guessTextField.clear();  // Clear the guess field for the new game
         isLastCity = false;  // Reset last city flag
