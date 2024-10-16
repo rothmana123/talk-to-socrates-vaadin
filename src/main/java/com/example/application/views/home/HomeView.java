@@ -199,7 +199,7 @@ public class HomeView extends Composite<VerticalLayout> {
     // Constructor for setting up the UI
     public HomeView() {
         // Create the OpenAIConversation object
-        conversation = new OpenAIConversation("demo", "gpt-4");
+        conversation = new OpenAIConversation("demo", "gpt-4o-mini");
 
         // Create the city label
         cityLabel = new Label("Current City: ");  // Display the initial city
