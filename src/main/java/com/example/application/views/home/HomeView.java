@@ -225,12 +225,9 @@ public class HomeView extends Composite<VerticalLayout> {
         Dotenv dotenv = Dotenv.load();
 
         // Access the API secret
-        String apiSecret = dotenv.get("OPENAI_API_KEY");
+        String secret = dotenv.get("SECRET");
 
-        System.out.println("Loaded API key: " + apiSecret);
-
-        conversation = new OpenAIConversation(apiSecret, "gpt-4");
-
+        conversation = new OpenAIConversation(secret, "gpt-4");
 
         cityLabel = new Label("Current City: ");
         evidenceList = new Label("Evidence Accumulated:");
