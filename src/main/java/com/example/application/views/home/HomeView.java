@@ -18,6 +18,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import ai.peoplecode.OpenAIConversation;
 import com.vaadin.flow.component.html.Label;
+import io.github.cdimascio.dotenv.Dotenv;
 //note for git
 
 import java.util.Random;
@@ -219,7 +220,18 @@ public class HomeView extends Composite<VerticalLayout> {
     }
 
     public HomeView() {
-        conversation = new OpenAIConversation("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", "gpt-4");
+
+
+        Dotenv dotenv = Dotenv.load();
+
+        // Access the API secret
+        String apiSecret = dotenv.get("OPENAI_API_KEY");
+
+        System.out.println("Loaded API key: " + apiSecret);
+
+        //conversation = new OpenAIConversation("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", "gpt-4");
+        conversation = new OpenAIConversation(apiSecret, "gpt-4");
+
 
         cityLabel = new Label("Current City: ");
         evidenceList = new Label("Evidence Accumulated:");
