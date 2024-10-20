@@ -7,3 +7,4 @@ vite.generated.ts
 
 # Ignore .env file
 .env
+# testing
