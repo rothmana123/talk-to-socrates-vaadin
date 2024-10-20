@@ -249,6 +249,7 @@ public class HomeView extends Composite<VerticalLayout> {
         questionButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         // Buttons for each city
+        //butto
         cityButton1.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         cityButton2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         cityButton3.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
