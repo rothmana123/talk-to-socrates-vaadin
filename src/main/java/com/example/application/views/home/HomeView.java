@@ -224,7 +224,7 @@ public class HomeView extends Composite<VerticalLayout> {
 
         Dotenv dotenv = Dotenv.load();
 
-        // Access the API secret
+        // Access the  secret
         String secret = dotenv.get("SECRET");
 
         conversation = new OpenAIConversation(secret, "gpt-4");
