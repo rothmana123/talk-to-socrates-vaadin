@@ -120,6 +120,7 @@ public class HomeView extends Composite<VerticalLayout> {
         @Override
         public void onComponentEvent(ClickEvent<Button> event) {
             // Get the cafe conversation from the current city
+            String cityName = currentCity.getName();
             String cafeConversation = currentCity.getCafeConversation();
             evidence.add(cafeConversation);
             System.out.println(evidence);// Accumulate each piece of evidence

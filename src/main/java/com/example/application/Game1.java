@@ -43,39 +43,66 @@ public class Game1 {
         return conversation.askQuestion("You are a merchant in " + cityName, question);
     }
 
-    // Generate a cafe conversation for a specific city using OpenAI
     private String generateCafeConversation(String cityName) {
-        // Determine the next city based on the current city
-        String nextCity = "";
+        String conversation = "";
 
+        // Provide set conversation content for each city
         switch (cityName) {
             case "Casablanca":
-                nextCity = "Marrakech";
+                conversation = "The café owner mentions that the person in question was intrigued by the tales of a city known for its red sandstone buildings, vibrant souks, and a famous square filled with storytellers and performers.";
                 break;
             case "Marrakech":
-                nextCity = "Fes";
+                conversation = "The café owner tells you stories of a city known for its ancient walled medina, a place where time seems to stand still, with a labyrinth of narrow streets, stunning madrasas, and the world's oldest university.";
                 break;
             case "Fes":
-                nextCity = "Tangiers";
+                conversation = "The café owner shares that the person in question seemed intrigued by a city where the Mediterranean meets the Atlantic, a place known for its blend of cultures and historical influences, where the sea meets the sky.";
                 break;
             case "Tangiers":
-                nextCity = "Rabat";
+                conversation = "The café owner describes a city where modern and traditional cultures coexist, a city with a blue-washed Kasbah and a blooming art scene, nestled by the Atlantic coast.";
                 break;
             case "Rabat":
-                nextCity = "nowhere, you are at the final destination.";  // End of journey, no next city
+                conversation = "The café owner says: 'The person in question was fascinated by an old proverb: Every road leads to the end of the world. It seemed he found what he was looking for right here, where history and contemporary art meet.'";
                 break;
             default:
-                nextCity = "unknown city";  // Just in case a city name is not recognized
+                conversation = "The café owner doesn't seem to know where the person might be heading next.";
                 break;
         }
 
-        // Generate the conversation using the current city and the next city clue
-        String question = "Imagine you are a cafe owner in " + cityName + ". A random person (the user) will visit your cafe to ask if you have seen "
-                + scenario.getCriminal() + ", but they don't know who it is yet; they only have small details. "
-                + "Give them a clue about the next city they should travel to, which is " + nextCity + ", but do not say what the next city is.  You must give a clue to " + nextCity + "!  Do not say the person was happy to stay in current city";
-
-        return conversation.askQuestion("You are a local in the cafe in " + cityName, question);
+        return conversation;  // Return the built-in conversation content based on the city
     }
+    // Generate a cafe conversation for a specific city using OpenAI
+//    private String generateCafeConversation(String cityName) {
+//        // Determine the next city based on the current city
+//        String nextCity = "";
+//
+//        switch (cityName) {
+//            case "Casablanca":
+//                nextCity = "Marrakech";
+//                break;
+//            case "Marrakech":
+//                nextCity = "Fes";
+//                break;
+//            case "Fes":
+//                nextCity = "Tangiers";
+//                break;
+//            case "Tangiers":
+//                nextCity = "Rabat";
+//                break;
+//            case "Rabat":
+//                nextCity = "nowhere, you are at the final destination.";  // End of journey, no next city
+//                break;
+//            default:
+//                nextCity = "unknown city";  // Just in case a city name is not recognized
+//                break;
+//        }
+//
+//        // Generate the conversation using the current city and the next city clue
+//        String question = "Imagine you are a cafe owner in " + cityName + ". A random person (the user) will visit your cafe to ask if you have seen "
+//                + scenario.getCriminal() + ", but they don't know who it is yet; they only have small details. "
+//                + "Give them a clue about the next city they should travel to, which is " + nextCity + ", but do not say what the next city is.  You must give a clue to " + nextCity + "!  Do not say the person was happy to stay in current city";
+//
+//        return conversation.askQuestion("You are a local in the cafe in " + cityName, question);
+//    }
 
 
     // Get the list of cities
