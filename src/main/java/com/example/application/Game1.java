@@ -9,7 +9,7 @@ public class Game1 {
     private ArrayList<City1> cities;
     private OpenAIConversation conversation;
     private Scenario1 scenario;
-    //where does the scenarion get created?
+    //where does the scenario get created?
 
     public Game1(OpenAIConversation conversation, Scenario1 scenario) {
         this.conversation = conversation;
@@ -39,7 +39,7 @@ public class Game1 {
     private String generateMarketConversation(String cityName) {
         String question = "Imagine you are a merchant in a market in " + cityName + ".  A random person (the user) will visit you in the market to ask you if you have seen "
                 + scenario.getCriminal() + ", but they dont know who it is yet, they only have small details.  Generate clues about " + scenario.getCriminal() + "to share with a potential user, but dont add actual conversation with them." +
-                "  For example, clues for Che Guevara would be \"Vendor mentions seeing a man with a Cuban cigar\", \"Saw a man in a beret\", \"Discussion about Bolivia and Cuba\", \"A man bought revolutionary pamphlets\"";
+                "  For example, clues for Che Guevara would be \"Vendor mentions seeing a man with a Cuban cigar\", \"Saw a man in a beret\", \"Discussion about Bolivia and Cuba\", \"A man bought revolutionary pamphlets\".";
         return conversation.askQuestion("You are a merchant in " + cityName, question);
     }
 
@@ -70,9 +70,9 @@ public class Game1 {
         }
 
         // Generate the conversation using the current city and the next city clue
-        String question = "Imagine you are a cafe owner in " + cityName + ". A random person (the user) visits your cafe to ask if you have seen "
+        String question = "Imagine you are a cafe owner in " + cityName + ". A random person (the user) will visit your cafe to ask if you have seen "
                 + scenario.getCriminal() + ", but they don't know who it is yet; they only have small details. "
-                + "Give them a clue about the next city they should travel to, which is " + nextCity + ", but do not say what the next city is.";
+                + "Give them a clue about the next city they should travel to, which is " + nextCity + ", but do not say what the next city is.  You must give a clue to " + nextCity + "!  Do not say the person was happy to stay in current city";
 
         return conversation.askQuestion("You are a local in the cafe in " + cityName, question);
     }

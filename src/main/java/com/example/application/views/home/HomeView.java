@@ -73,6 +73,33 @@ public class HomeView extends Composite<VerticalLayout> {
                 Available actions for the player are: go to market, go to cafe, get in a taxi to travel to the next city.
             """;
 
+    // Listeners for each city button
+    class CityButtonListener implements ComponentEventListener<ClickEvent<Button>> {
+        private final int cityIndex;
+        private final String cityName;
+
+        public CityButtonListener(int cityIndex, String cityName) {
+            this.cityIndex = cityIndex;
+            this.cityName = cityName;
+        }
+
+        @Override
+        public void onComponentEvent(ClickEvent<Button> event) {
+            // Travel to the selected city
+            currentCityIndex = cityIndex;
+            currentCity = game.getCities().get(currentCityIndex);
+            cityLabel.setText("Current City: " + currentCity.getName());
+            replyText.setText("You have traveled to " + currentCity.getName() + ". Visit the Market, a Cafe, or Travel to another City.");
+
+            // Check if the chosen city is correct
+            checkCity(cityName);
+
+            if (currentCityIndex == currentScenario.getCities().size() - 1) {
+                isLastCity = true;
+            }
+        }
+    }
+
     // Listener for Market button
     class MarketClickListener implements ComponentEventListener<ClickEvent<Button>> {
         @Override
@@ -94,7 +121,8 @@ public class HomeView extends Composite<VerticalLayout> {
         public void onComponentEvent(ClickEvent<Button> event) {
             // Get the cafe conversation from the current city
             String cafeConversation = currentCity.getCafeConversation();
-            evidence.add(cafeConversation);  // Accumulate each piece of evidence
+            evidence.add(cafeConversation);
+            System.out.println(evidence);// Accumulate each piece of evidence
             replyText.setText("You are in a local cafe. You can ask people at the cafe questions about the mystery person.");
 
             if (isLastCity) {
@@ -103,38 +131,42 @@ public class HomeView extends Composite<VerticalLayout> {
         }
     }
 
-    // Listeners for each city button
-    class CityButtonListener implements ComponentEventListener<ClickEvent<Button>> {
-        private final int cityIndex;
-        private final String cityName;
 
-        public CityButtonListener(int cityIndex, String cityName) {
-            this.cityIndex = cityIndex;
-            this.cityName = cityName;
-        }
-
+    // Listener for submitting questions (conversation with ChatGPT)
+    class QuestionButtonListener implements ComponentEventListener<ClickEvent<Button>> {
         @Override
         public void onComponentEvent(ClickEvent<Button> event) {
-            // Travel to the selected city
-            currentCityIndex = cityIndex;
-            currentCity = game.getCities().get(currentCityIndex);
-            cityLabel.setText("Current City: " + currentCity.getName());
-            replyText.setText("You have traveled to " + currentCity.getName() + ". Choose your next action.");
+            String question = questionTextField.getValue();
 
-            // Check if the chosen city is correct
-            checkCity(cityName);
+            // Accumulate all evidence for context
+//            StringBuilder evidenceDetails = new StringBuilder();
+//            for (String clue : evidence) {
+//                evidenceDetails.append("\n- ").append(clue);
+//            }
 
-            if (currentCityIndex == currentScenario.getCities().size() - 1) {
-                isLastCity = true;
-            }
+            // Include all collected evidence in the conversation context
+            System.out.println(evidence);
+            String context = "You are a merchant in " + currentCity.getName() + ". The evidence collected so far is: " + evidence.toString() + ". Please answer the player's question based on this information.  " +
+                    "Do not mention that you are AI.  You are either a merchant or a cafe owner.  Also, dont mention evidence that indicates that the suspect is coming to the current city, only evidence that " +
+                    "mentions the next possible city.  Lastly, you may add additional details from your knowledge of the person, beyond what is provided as evidence, but dont share more than 2 details AT A TIME when you speak.  You can add more if the user asks follow-up questions ";
+            String reply = conversation.askQuestion(context, question);
+
+            // Display the response from the API
+            replyText.setText(reply);
+            questionTextField.setValue("");
+
         }
     }
 
-    // Listener for Reset button
-    class ResetClickListener implements ComponentEventListener<ClickEvent<Button>> {
+    class SubmitGuessListener implements ComponentEventListener<ClickEvent<Button>> {
         @Override
         public void onComponentEvent(ClickEvent<Button> event) {
-            startNewGame();
+            String guess = guessTextField.getValue().trim();
+            if (guess.equalsIgnoreCase(currentScenario.getCriminal())) {
+                replyText.setText("Correct! The famous person hiding in Morocco is " + currentScenario.getCriminal() + "!");
+            } else {
+                replyText.setText("Incorrect. Try again.");
+            }
         }
     }
 
@@ -151,110 +183,122 @@ public class HomeView extends Composite<VerticalLayout> {
         }
     }
 
-    // Listener for submitting questions (conversation with ChatGPT)
-    class QuestionButtonListener implements ComponentEventListener<ClickEvent<Button>> {
+    // Listener for Reset button
+    class ResetClickListener implements ComponentEventListener<ClickEvent<Button>> {
         @Override
         public void onComponentEvent(ClickEvent<Button> event) {
-            String question = questionTextField.getValue();
-
-            // Accumulate all evidence for context
-//            StringBuilder evidenceDetails = new StringBuilder();
-//            for (String clue : evidence) {
-//                evidenceDetails.append("\n- ").append(clue);
-//            }
-
-            // Include all collected evidence in the conversation context
-            String context = "You are a merchant in " + currentCity.getName() + ". The evidence collected so far is: " + evidence.toString() + ". Please answer the player's question based on this information.  Do not mention that you are AI.  You are either a merchant or a cafe owner.  Also, dont mention evidence that indicates that the suspect is coming to the current city, only evidence that mentions the next possible city.  Lastly, you may add additional details from your knowledge of the person, beyond what is provided as evidence";
-            String reply = conversation.askQuestion(context, question);
-
-            // Display the response from the API
-            replyText.setText(reply);
-        }
-    }
-
-    class SubmitGuessListener implements ComponentEventListener<ClickEvent<Button>> {
-        @Override
-        public void onComponentEvent(ClickEvent<Button> event) {
-            String guess = guessTextField.getValue().trim();
-            if (guess.equalsIgnoreCase(currentScenario.getCriminal())) {
-                replyText.setText("Correct! The famous person hiding in Morocco is " + currentScenario.getCriminal() + "!");
-            } else {
-                replyText.setText("Incorrect. Try again.");
-            }
+            startNewGame();
         }
     }
 
     public HomeView() {
-        Dotenv dotenv = Dotenv.load();
-        String secret = dotenv.get("SECRET");
+            Dotenv dotenv = Dotenv.load();
+            String secret = dotenv.get("SECRET");
 
-        conversation = new OpenAIConversation(secret, "gpt-4");
-        currentScenario = new Scenario1(conversation);  // Initialize Scenario1 here
-        game = new Game1(conversation, currentScenario);  // Initialize Game1 here
+            conversation = new OpenAIConversation(secret, "gpt-4");
+            currentScenario = new Scenario1(conversation);  // Initialize Scenario1 here
+            game = new Game1(conversation, currentScenario);  // Initialize Game1 here
 
-        cityLabel = new Label("Current City: ");
-        evidenceList = new Label("Evidence Accumulated:");
-        evidenceList.setWidth("80%");
-        evidenceList.getStyle().set("border", "1px solid black");
+            cityLabel = new Label("Current City: Casablanca");
 
-        replyText = new Paragraph();
-        replyText.setWidth("80%");
-        replyText.setHeight("300px");
-        replyText.getStyle().set("border", "1px solid black");
+            // Initialize replyText
+            replyText = new Paragraph();
+            replyText.setWidth("80%");
+            replyText.setHeight("300px");
+            replyText.getStyle().set("border", "1px solid black");
 
-        getContent().setWidth("100%");
+            // Initialize evidenceList
+            evidenceList = new Label("Evidence Accumulated:");
+            evidenceList.setWidth("80%");
+            evidenceList.getStyle().set("border", "1px solid black");
 
-        marketButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        cafeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        resetButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        submitGuessButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        addEvidenceButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        questionButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            // Initialize guessTextField and guess button
+            guessTextField = new TextField("Your Guess");
+            guessTextField.setWidth("100%");
+            submitGuessButton = new Button("Submit Guess");
 
-        // Buttons for each city
-        cityButton1.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        cityButton2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        cityButton3.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        cityButton4.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        cityButton5.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            // Initialize addEvidenceTextField and add evidence button
+            addEvidenceTextField = new TextField("Add New Evidence");
+            addEvidenceTextField.setWidth("100%");
+            addEvidenceButton = new Button("Add Evidence");
 
-        replyText.setText(GAME_CONTEXT);
+            // Initialize reset button
+            resetButton = new Button("Reset Game");
+            resetButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
 
-        // Add the city buttons to a HorizontalLayout
-        HorizontalLayout cityButtonsLayout = new HorizontalLayout(cityButton1, cityButton2, cityButton3, cityButton4, cityButton5);
+            // Question area
+            questionTextField = new TextField("Your Question");
+            questionTextField.setWidth("100%");
+            questionButton = new Button("Submit Question");
 
-        // Add components to the layout
-        getContent().add(cityLabel);
-        getContent().add(questionTextField);
-        getContent().add(questionButton);
-        getContent().add(marketButton);
-        getContent().add(cafeButton);
-        getContent().add(cityButtonsLayout);  // Add the city buttons layout here
-        getContent().add(replyText);
-        getContent().add(evidenceList);
-        getContent().add(addEvidenceTextField);
-        getContent().add(addEvidenceButton);
-        getContent().add(guessTextField);
-        getContent().add(submitGuessButton);
-        getContent().add(resetButton);
+            // Market and Cafe buttons
+            marketButton = new Button("Go to Market");
+            cafeButton = new Button("Go to Café");
 
-        // Attach click listeners
-        marketButton.addClickListener(new MarketClickListener());
-        cafeButton.addClickListener(new CafeClickListener());
-        cityButton1.addClickListener(new CityButtonListener(0, "Casablanca"));
-        cityButton2.addClickListener(new CityButtonListener(1, "Marrakech"));
-        cityButton3.addClickListener(new CityButtonListener(2, "Fes"));
-        cityButton4.addClickListener(new CityButtonListener(3, "Tangier"));
-        cityButton5.addClickListener(new CityButtonListener(4, "Rabat"));
-        resetButton.addClickListener(new ResetClickListener());
-        submitGuessButton.addClickListener(new SubmitGuessListener());
-        addEvidenceButton.addClickListener(new AddEvidenceListener());
-        questionButton.addClickListener(new QuestionButtonListener());
+            // Action buttons styling
+            marketButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            cafeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            questionButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+            // City Buttons for travel
+            cityButton1 = new Button("Casablanca");
+            cityButton2 = new Button("Marrakech");
+            cityButton3 = new Button("Fes");
+            cityButton4 = new Button("Tangier");
+            cityButton5 = new Button("Rabat");
+
+            // City buttons styling
+            cityButton1.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            cityButton2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            cityButton3.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            cityButton4.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            cityButton5.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+            // Vertical layout for the left section (current city and actions)
+            VerticalLayout leftLayout = new VerticalLayout();
+            leftLayout.add(cityLabel, questionTextField, questionButton, marketButton, cafeButton);
+            leftLayout.setWidth("50%"); // Half of the screen
+
+            // Vertical layout for the right section (travel to new city)
+            VerticalLayout rightLayout = new VerticalLayout();
+            rightLayout.add(cityButton1, cityButton2, cityButton3, cityButton4, cityButton5);
+            rightLayout.setWidth("50%"); // Half of the screen
+
+            // Horizontal layout to place left and right sections side by side
+            HorizontalLayout mainLayout = new HorizontalLayout(leftLayout, rightLayout);
+            mainLayout.setWidth("100%");  // Full width of the screen
+
+            // Add the main layout to the view
+            getContent().add(mainLayout);
+            getContent().add(replyText);
+            getContent().add(evidenceList);
+            getContent().add(addEvidenceTextField);
+            getContent().add(addEvidenceButton);
+            getContent().add(guessTextField);
+            getContent().add(submitGuessButton);
+            getContent().add(resetButton);
+
+            // Attach click listeners
+            marketButton.addClickListener(new MarketClickListener());
+            cafeButton.addClickListener(new CafeClickListener());
+            cityButton1.addClickListener(new CityButtonListener(0, "Casablanca"));
+            cityButton2.addClickListener(new CityButtonListener(1, "Marrakech"));
+            cityButton3.addClickListener(new CityButtonListener(2, "Fes"));
+            cityButton4.addClickListener(new CityButtonListener(3, "Tangier"));
+            cityButton5.addClickListener(new CityButtonListener(4, "Rabat"));
+            questionButton.addClickListener(new QuestionButtonListener());
+            submitGuessButton.addClickListener(new SubmitGuessListener());
+            resetButton.addClickListener(new ResetClickListener());
+            addEvidenceButton.addClickListener(new AddEvidenceListener());
+
 
         startNewGame();
     }
 
     private void startNewGame() {
+        currentScenario = new Scenario1(conversation);  // Initialize Scenario1 here
+        game = new Game1(conversation, currentScenario);
+
         //game = new Game();
         //current Scenario == game.loadScenario -->look through game.loadScenario
         //currentScenario = game.loadScenarios().get((int) (Math.random() * game.loadScenarios().size()));
@@ -287,6 +331,76 @@ public class HomeView extends Composite<VerticalLayout> {
     }
 }
 
+
+//        Dotenv dotenv = Dotenv.load();
+//        String secret = dotenv.get("SECRET");
+//
+//        conversation = new OpenAIConversation(secret, "gpt-4");
+//        currentScenario = new Scenario1(conversation);  // Initialize Scenario1 here
+//        game = new Game1(conversation, currentScenario);  // Initialize Game1 here
+//
+//        cityLabel = new Label("Current City: ");
+//        evidenceList = new Label("Evidence Accumulated:");
+//        evidenceList.setWidth("80%");
+//        evidenceList.getStyle().set("border", "1px solid black");
+//
+//        replyText = new Paragraph();
+//        replyText.setWidth("80%");
+//        replyText.setHeight("300px");
+//        replyText.getStyle().set("border", "1px solid black");
+//
+//        getContent().setWidth("100%");
+//
+//        marketButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+//        cafeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+//        resetButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+//        submitGuessButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+//        addEvidenceButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+//        questionButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+//
+//        // Buttons for each city
+//        cityButton1.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+//        cityButton2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+//        cityButton3.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+//        cityButton4.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+//        cityButton5.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+//
+//        replyText.setText(GAME_CONTEXT);
+//
+//        // Add the city buttons to a HorizontalLayout
+//        HorizontalLayout cityButtonsLayout = new HorizontalLayout(cityButton1, cityButton2, cityButton3, cityButton4, cityButton5);
+//
+//        // Add components to the layout
+//        getContent().add(cityLabel);
+//        getContent().add(questionTextField);
+//        getContent().add(questionButton);
+//        getContent().add(marketButton);
+//        getContent().add(cafeButton);
+//        getContent().add(cityButtonsLayout);  // Add the city buttons layout here
+//        getContent().add(replyText);
+//        getContent().add(evidenceList);
+//        getContent().add(addEvidenceTextField);
+//        getContent().add(addEvidenceButton);
+//        getContent().add(guessTextField);
+//        getContent().add(submitGuessButton);
+//        getContent().add(resetButton);
+//
+//        // Attach click listeners
+//        marketButton.addClickListener(new MarketClickListener());
+//        cafeButton.addClickListener(new CafeClickListener());
+//        cityButton1.addClickListener(new CityButtonListener(0, "Casablanca"));
+//        cityButton2.addClickListener(new CityButtonListener(1, "Marrakech"));
+//        cityButton3.addClickListener(new CityButtonListener(2, "Fes"));
+//        cityButton4.addClickListener(new CityButtonListener(3, "Tangier"));
+//        cityButton5.addClickListener(new CityButtonListener(4, "Rabat"));
+//        resetButton.addClickListener(new ResetClickListener());
+//        submitGuessButton.addClickListener(new SubmitGuessListener());
+//        addEvidenceButton.addClickListener(new AddEvidenceListener());
+//        questionButton.addClickListener(new QuestionButtonListener());
+//
+//        startNewGame();
+
+//Code for non-AI version
 // Listener for Market button
 //    class MarketClickListener implements ComponentEventListener<ClickEvent<Button>> {
 //        @Override

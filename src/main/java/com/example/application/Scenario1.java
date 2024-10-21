@@ -4,6 +4,7 @@ import ai.peoplecode.OpenAIConversation;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Scenario1 {
     private String person;
@@ -52,7 +53,11 @@ public class Scenario1 {
 
     // Method to fetch criminal from OpenAI
     private String fetchCriminalFromAI(OpenAIConversation conversation) {
-        String question = "Generate a famous person from the 20th or 21st century.  No criminals or questionable poltical people.";
+        String[] categories = {"a scientist", "an artist", "a politician", "an activist", "a writer", "a musician"};
+        Random random = new Random();
+        String category = categories[random.nextInt(categories.length)];
+
+        String question = "Generate a " + category + " from the 20th or 21st century.  No criminals or questionable political people. And just start me off with their name, not a full bio";
         String person = conversation.askQuestion("You are an expert in the 20th and 21st centuries", question);
         return person;
     }
