@@ -1,61 +1,62 @@
-# instructions for Intellij Usage
-1. On the main page of this repo, click on code and HTML to copy the git URL for this repo
-2. In Intellij, File | New Project| From Version Control
-3. Control Click on the PeopleCode library in the lib folder and choose "Add to Library"
-4. in the src folder, find the Application class and run it.
-5. A browser window will open and show a local version of your webapp at localhost:8080
+# Morocco Noir
 
+**Morocco Noir** is a mystery adventure game inspired by *Where in the World is Carmen Sandiego?*, powered by OpenAI’s GPT-4. The player takes on the role of a detective in search of a famous historical figure hiding somewhere in Morocco. Through conversations with locals, the player gathers clues and evidence in different Moroccan cities to identify the suspect before time runs out.
 
-# GENERATED DOCUMENTATION BELOW HERE
+## Features
+- Explore 5 iconic cities in Morocco: Casablanca, Marrakech, Fes, Tangiers, and Rabat.
+- Engage in conversations with market merchants and café owners for clues.
+- Use clues to track down the famous historical figure hiding in Morocco.
+- Powered by OpenAI GPT-4 to generate dynamic market conversations.
+- Predefined café conversations with unique hints in each city.
 
-# Custom project from Hilla
+## How to Play
+1. Start in Casablanca and gather clues by visiting the market or a café.
+2. Travel between cities using the taxi option, choosing your destinations wisely.
+3. Use the clues to piece together the identity of the hidden historical figure.
+4. Submit your guess when you think you know who the suspect is.
 
-This project can be used as a starting point to create your own Hilla application with Spring Boot.
-It contains all the necessary configuration and some placeholder files to get you started.
+## Requirements
+- OpenAI API Secret Key (GPT-4)
+- A valid `.env` file with your API key set.
 
-## Running the application
+## Installation
 
-The project is a standard Maven project. To run it from the command line,
-type `mvnw` (Windows), or `./mvnw` (Mac & Linux), then open
-http://localhost:8080 in your browser.
+1. **Clone the repository**:
+    ```bash
+    git clone https://github.com/your-username/morocco-noir.git
+    cd morocco-noir
+    ```
 
-You can also import the project to your IDE of choice as you would with any
-Maven project.
+2. **Set up your environment**:
+    Create a `.env` file in the root of your project and add your OpenAI secret API key like this:
+    ```
+    SECRET=your_openai_api_key_here
+    ```
 
-## Deploying to Production
+3. **Run the application**:
+    Depending on your setup, use the appropriate command to run the application.
 
-To create a production build, call `mvnw clean package -Pproduction` (Windows),
-or `./mvnw clean package -Pproduction` (Mac & Linux).
-This will build a JAR file with all the dependencies and front-end resources,
-ready to be deployed. The file can be found in the `target` folder after the build completes.
+## Game Structure
 
-Once the JAR file is built, you can run it using
-`java -jar target/myapp-1.0-SNAPSHOT.jar` (NOTE, replace
-`myapp-1.0-SNAPSHOT.jar` with the name of your jar).
+- **Cities**: The game features five cities in Morocco. Each city offers its own set of market and café clues.
+  - **Casablanca**: Vibrant souks and red sandstone buildings.
+  - **Marrakech**: Ancient medina with a labyrinth of streets.
+  - **Fes**: A city where the Mediterranean meets the Atlantic.
+  - **Tangiers**: A blend of modern and traditional cultures.
+  - **Rabat**: The capital where history meets contemporary art.
 
-## Project structure
+- **Clues and Evidence**: Gather clues by visiting the market and café in each city. Markets provide dynamically generated clues using OpenAI’s GPT-4, while café clues are pre-set and give valuable hints about the suspect’s next move.
 
-<table style="width:100%; text-align: left;">
-  <tr><th>Directory</th><th>Description</th></tr>
-  <tr><td><code>src/main/frontend/</code></td><td>Client-side source directory</td></tr>
-  <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<code>index.html</code></td><td>HTML template</td></tr>
-  <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<code>index.ts</code></td><td>Frontend 
-entrypoint, bootstraps a React application</td></tr>
-  <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<code>routes.tsx</code></td><td>React Router routes definition</td></tr>
-  <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<code>MainLayout.tsx</code></td><td>Main 
-layout component, contains the navigation menu, uses <a href="https://hilla.dev/docs/react/components/app-layout">
-App Layout</a></td></tr>
-  <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<code>views/</code></td><td>UI view 
-components</td></tr>
-  <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<code>themes/</code></td><td>Custom  
-CSS styles</td></tr>
-  <tr><td><code>src/main/java/&lt;groupId&gt;/</code></td><td>Server-side 
-source directory, contains the server-side Java views</td></tr>
-  <tr><td>&nbsp;&nbsp;&nbsp;&nbsp;<code>Application.java</code></td><td>Server entry-point</td></tr>
-</table>
+- **Game Flow**:
+  1. Start in Casablanca.
+  2. Gather clues at the market or café.
+  3. Travel between cities to collect more evidence.
+  4. After gathering enough evidence, submit your guess to identify the suspect.
 
-## Useful links
+## Customization
 
-- Read the documentation at [hilla.dev/docs](https://hilla.dev/docs/).
-- Ask questions on [Stack Overflow](https://stackoverflow.com/questions/tagged/hilla) or join our [Discord channel](https://discord.gg/MYFq5RTbBn).
-- Report issues, create pull requests in [GitHub](https://github.com/vaadin/hilla).
+### OpenAI API
+The game leverages OpenAI's GPT-4 to generate market conversations dynamically. Make sure to add your OpenAI secret key to the `.env` file to enable this functionality.
+
+```env
+SECRET=your_openai_api_key
