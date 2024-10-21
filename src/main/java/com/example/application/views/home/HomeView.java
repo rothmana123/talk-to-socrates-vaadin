@@ -1,8 +1,8 @@
 package com.example.application.views.home;
 
-import com.example.application.City;
-import com.example.application.Game;
-import com.example.application.Scenario;
+import com.example.application.City1;
+import com.example.application.Game1;
+import com.example.application.Scenario1;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -19,7 +19,6 @@ import com.vaadin.flow.router.RouteAlias;
 import ai.peoplecode.OpenAIConversation;
 import com.vaadin.flow.component.html.Label;
 import io.github.cdimascio.dotenv.Dotenv;
-//note for git
 
 import java.util.Random;
 import java.util.ArrayList;
@@ -30,13 +29,12 @@ import java.util.ArrayList;
 @RouteAlias(value = "")
 public class HomeView extends Composite<VerticalLayout> {
 
-    private Game game;
-    private Scenario currentScenario;
-    private City currentCity;
+    private Game1 game;
+    private Scenario1 currentScenario;
+    private City1 currentCity;
     private int currentCityIndex = 0;
 
     private OpenAIConversation conversation;
-    //private String evidence = "";  // Class-level variable to store the evidence
     private ArrayList<String> evidence = new ArrayList<>();
     private TextField askText;
     private String question;
@@ -79,15 +77,10 @@ public class HomeView extends Composite<VerticalLayout> {
     class MarketClickListener implements ComponentEventListener<ClickEvent<Button>> {
         @Override
         public void onComponentEvent(ClickEvent<Button> event) {
-            String location = "market";
-
-            ArrayList<String> marketConversations = currentCity.getMarketConversations();
-            if (!marketConversations.isEmpty()) {
-                for (String marketEvidence : marketConversations) {
-                    evidence.add(marketEvidence);  // Accumulate each piece of evidence
-                }
-                replyText.setText("You are in the " + location + ". You can ask a local merchant questions about the mystery person.");
-            }
+            // Get the market conversation from the current city
+            String marketConversation = currentCity.getMarketConversation();
+            evidence.add(marketConversation);  // Accumulate each piece of evidence
+            replyText.setText("You are in the market. You can ask a local merchant questions about the mystery person.");
 
             if (isLastCity) {
                 promptForGuess();
@@ -99,15 +92,10 @@ public class HomeView extends Composite<VerticalLayout> {
     class CafeClickListener implements ComponentEventListener<ClickEvent<Button>> {
         @Override
         public void onComponentEvent(ClickEvent<Button> event) {
-            String location = "cafe";
-            ArrayList<String> cafeConversations = currentCity.getCafeConversations();
-            if (!cafeConversations.isEmpty()) {
-                for (String cafeEvidence : cafeConversations) {
-                    evidence.add(cafeEvidence);  // Accumulate each piece of evidence
-                }
-
-                replyText.setText("You are in the " + location + ". You can ask people at the cafe questions about the mystery person.");
-            }
+            // Get the cafe conversation from the current city
+            String cafeConversation = currentCity.getCafeConversation();
+            evidence.add(cafeConversation);  // Accumulate each piece of evidence
+            replyText.setText("You are in a local cafe. You can ask people at the cafe questions about the mystery person.");
 
             if (isLastCity) {
                 promptForGuess();
@@ -115,27 +103,6 @@ public class HomeView extends Composite<VerticalLayout> {
         }
     }
 
-    // Listeners for each city button
-//    class CityButtonListener implements ComponentEventListener<ClickEvent<Button>> {
-//        private final int cityIndex;
-//
-//        public CityButtonListener(int cityIndex) {
-//            this.cityIndex = cityIndex;
-//        }
-//
-//        @Override
-//        public void onComponentEvent(ClickEvent<Button> event) {
-//            // Travel to the selected city
-//            currentCityIndex = cityIndex;
-//            currentCity = currentScenario.getCities().get(currentCityIndex);
-//            cityLabel.setText("Current City: " + currentCity.getName());
-//            replyText.setText("You have traveled to " + currentCity.getName() + ". Choose your next action.");
-//
-//            if (currentCityIndex == currentScenario.getCities().size() - 1) {
-//                isLastCity = true;
-//            }
-//        }
-//    }
     // Listeners for each city button
     class CityButtonListener implements ComponentEventListener<ClickEvent<Button>> {
         private final int cityIndex;
@@ -150,7 +117,7 @@ public class HomeView extends Composite<VerticalLayout> {
         public void onComponentEvent(ClickEvent<Button> event) {
             // Travel to the selected city
             currentCityIndex = cityIndex;
-            currentCity = currentScenario.getCities().get(currentCityIndex);
+            currentCity = game.getCities().get(currentCityIndex);
             cityLabel.setText("Current City: " + currentCity.getName());
             replyText.setText("You have traveled to " + currentCity.getName() + ". Choose your next action.");
 
@@ -185,7 +152,6 @@ public class HomeView extends Composite<VerticalLayout> {
     }
 
     // Listener for submitting questions (conversation with ChatGPT)
-    // Listener for submitting questions (conversation with ChatGPT)
     class QuestionButtonListener implements ComponentEventListener<ClickEvent<Button>> {
         @Override
         public void onComponentEvent(ClickEvent<Button> event) {
@@ -206,7 +172,6 @@ public class HomeView extends Composite<VerticalLayout> {
         }
     }
 
-
     class SubmitGuessListener implements ComponentEventListener<ClickEvent<Button>> {
         @Override
         public void onComponentEvent(ClickEvent<Button> event) {
@@ -220,14 +185,12 @@ public class HomeView extends Composite<VerticalLayout> {
     }
 
     public HomeView() {
-
-
         Dotenv dotenv = Dotenv.load();
-
-        // Access the  secret
         String secret = dotenv.get("SECRET");
 
         conversation = new OpenAIConversation(secret, "gpt-4");
+        currentScenario = new Scenario1(conversation);  // Initialize Scenario1 here
+        game = new Game1(conversation, currentScenario);  // Initialize Game1 here
 
         cityLabel = new Label("Current City: ");
         evidenceList = new Label("Evidence Accumulated:");
@@ -249,7 +212,6 @@ public class HomeView extends Composite<VerticalLayout> {
         questionButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         // Buttons for each city
-        //butto
         cityButton1.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         cityButton2.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         cityButton3.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -293,11 +255,15 @@ public class HomeView extends Composite<VerticalLayout> {
     }
 
     private void startNewGame() {
-        game = new Game();
-        currentScenario = game.loadScenarios().get((int) (Math.random() * game.loadScenarios().size()));
+        //game = new Game();
+        //current Scenario == game.loadScenario -->look through game.loadScenario
+        //currentScenario = game.loadScenarios().get((int) (Math.random() * game.loadScenarios().size()));
 
+        //current City = 0 (is there a current city list???)
         currentCityIndex = 0;
-        currentCity = currentScenario.getCities().get(currentCityIndex);
+
+        //currentCity = currentScenario (random scenario from game.loadScenarios)
+        currentCity = game.getCities().get(currentCityIndex);
         cityLabel.setText("Current City: " + currentCity.getName());
 
         String initialClue = "The person you're looking for is " + currentScenario.getGender() + ". " + currentScenario.getInitialDetail();
@@ -321,3 +287,42 @@ public class HomeView extends Composite<VerticalLayout> {
     }
 }
 
+// Listener for Market button
+//    class MarketClickListener implements ComponentEventListener<ClickEvent<Button>> {
+//        @Override
+//        public void onComponentEvent(ClickEvent<Button> event) {
+//            String location = "market";
+//
+//            String marketConversations = currentCity.getMarketConversation();
+//            if (!marketConversations.isEmpty()) {
+//                for (String marketEvidence : marketConversation) {
+//                    evidence.add(marketEvidence);  // Accumulate each piece of evidence
+//                }
+//                replyText.setText("You are in the " + location + ". You can ask a local merchant questions about the mystery person.");
+//            }
+//
+//            if (isLastCity) {
+//                promptForGuess();
+//            }
+//        }
+//    }
+
+//    // Listener for Café button
+//    class CafeClickListener implements ComponentEventListener<ClickEvent<Button>> {
+//        @Override
+//        public void onComponentEvent(ClickEvent<Button> event) {
+//            String location = "cafe";
+//            ArrayList<String> cafeConversations = currentCity.getCafeConversations();
+//            if (!cafeConversations.isEmpty()) {
+//                for (String cafeEvidence : cafeConversations) {
+//                    evidence.add(cafeEvidence);  // Accumulate each piece of evidence
+//                }
+//
+//                replyText.setText("You are in the " + location + ". You can ask people at the cafe questions about the mystery person.");
+//            }
+//
+//            if (isLastCity) {
+//                promptForGuess();
+//            }
+//        }
+//    }
