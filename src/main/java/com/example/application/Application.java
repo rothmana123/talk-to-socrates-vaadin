@@ -20,6 +20,7 @@ public class Application implements AppShellConfigurator {
 
         SpringApplication.run(Application.class, args);
         //practicing commits
+        //adding notes
     }
 
 }
